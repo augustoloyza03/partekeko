@@ -1,0 +1,136 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Antirrebote is
+	Port (
+		inicio: in std_logic;
+		ck: in std_logic;
+		S: in std_logic;
+		F: in std_logic;
+		Z: out std_logic;
+		E: out std_logic
+		);
+end Antirrebote;
+
+architecture behavioral of Antirrebote is
+
+type nombres_estados is (FP, FN, B, A);
+signal estado: nombres_estados;
+signal entrada_aux: std_logic_vector (1 downto 0);
+
+begin
+
+entrada_aux<=S&F;
+
+process(inicio, ck)
+begin
+if inicio='1' then
+	estado<=FP;
+elsif ck='1' and ck'event then
+	case estado is
+		when FP =>
+			case entrada_aux is
+				when "00" => estado<=B;
+				when "01" => estado<=FP;
+				when "10" => estado<=A;
+				when "11" => estado<=FP;
+				when others => estado<=FP;
+			end case;
+		when FN =>
+			case entrada_aux is
+				when "00" => estado<=B;
+				when "01" => estado<=FN;
+				when "10" => estado<=A;
+				when "11" => estado<=FN;
+				when others => estado<=FP;
+			end case;
+		when B =>
+			case entrada_aux is
+				when "00" => estado<=B;
+				when "01" => estado<=B;
+				when "10" => estado<=FP;
+				when "11" => estado<=FP;
+				when others => estado<=FP;
+			end case;
+		when A =>
+			case entrada_aux is
+				when "00" => estado<=FN;
+				when "01" => estado<=FN;
+				when "10" => estado<=A;
+				when "11" => estado<=A;
+				when others => estado<=FP;
+			end case;
+		when others => estado<=FP;
+	end case;
+end if;
+end process;
+
+process(estado, entrada_aux)
+begin
+case estado is
+		when FP =>
+			case entrada_aux is
+				when "00" =>
+					Z<='0';
+					E<='0';
+				when "01" =>
+					Z<='0';
+					E<='1';
+				when "10" =>
+					Z<='1';
+					E<='0';
+				when "11" =>
+					Z<='0';
+					E<='1';
+			end case;
+		when FN =>
+			case entrada_aux is
+				when "00" =>
+					Z<='0';
+					E<='0';
+				when "01" =>
+					Z<='1';
+					E<='1';
+				when "10" =>
+					Z<='1';
+					E<='0';
+				when "11" =>
+					Z<='1';
+					E<='1';
+			end case;
+		when B =>
+			case entrada_aux is
+				when "00" =>
+					Z<='0';
+					E<='0';
+				when "01" =>
+					Z<='0';
+					E<='0';
+				when "10" =>
+					Z<='0';
+					E<='1';
+				when "11" =>
+					Z<='0';
+					E<='1';
+			end case;
+		when A =>
+			case entrada_aux is
+				when "00" =>
+					Z<='1';
+					E<='1';
+				when "01" =>
+					Z<='1';
+					E<='1';
+				when "10" =>
+					Z<='1';
+					E<='0';
+				when "11" =>
+					Z<='1';
+					E<='0';
+			end case;
+	end case;
+end process;
+
+end behavioral;

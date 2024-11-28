@@ -1,0 +1,7 @@
+
+State Machine - |Antirreboteesquema|Antirrebote:inst|estado
+Name estado.A estado.B estado.FN estado.FP 
+estado.FP 0 0 0 0 
+estado.FN 0 0 1 1 
+estado.B 0 1 0 1 
+estado.A 1 0 0 1 
